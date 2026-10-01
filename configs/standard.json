@@ -1,0 +1,23 @@
+{
+  "profile": "standard",
+  "seed": 42,
+  "episodes": 50,
+  "train_episodes": 40,
+  "test_episodes": 20,
+  "max_steps": 200,
+  "image_size": 256,
+  "step_scale": 0.04,
+  "fps": 10,
+  "epochs": 2,
+  "batch_size": 2,
+  "window_stride": 1,
+  "chunk_size": 50,
+  "inference_steps": 10,
+  "device": "auto",
+  "lora_rank": 8,
+  "lora_alpha": 16,
+  "partial_lr": 0.0001,
+  "lora_lr": 0.0001,
+  "eval_noise_seed": 10000
+}
+

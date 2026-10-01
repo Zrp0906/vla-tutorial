@@ -1,0 +1,23 @@
+{
+  "profile": "smoke",
+  "seed": 42,
+  "episodes": 10,
+  "train_episodes": 8,
+  "test_episodes": 4,
+  "max_steps": 48,
+  "image_size": 256,
+  "step_scale": 0.04,
+  "fps": 10,
+  "epochs": 2,
+  "batch_size": 2,
+  "window_stride": 8,
+  "chunk_size": 16,
+  "inference_steps": 2,
+  "device": "auto",
+  "lora_rank": 8,
+  "lora_alpha": 16,
+  "partial_lr": 0.0001,
+  "lora_lr": 0.0001,
+  "eval_noise_seed": 10000
+}
+

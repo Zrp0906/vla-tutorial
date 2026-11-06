@@ -1,32 +1,27 @@
-r"""采集两条语言指令的成功示范并保存轨迹与独立测试清单。
+"""
+功能：
+    用专家采集成功轨迹、回放和训练/验证/测试划分。
 
 输入：
-    - 统一配置、运行目录和脚本专家；默认 50 条成功示范，每条指令 25 条。
-    - 按完整轨迹划分 40 条训练、10 条验证；另保存 20 个固定独立测试场景。
+    <run>/data/raw/episode_XXX/trajectory.json
 
 输出：
-    - data/raw/episode_XXX/ 下的逐帧 PNG 与 trajectory.json。
-    - data/raw/manifest.json 记录轨迹划分、失败尝试与测试 seed/goal；reports/expert_goal_0.gif、expert_goal_1.gif。
-    - 原始数据目录或清单已存在时拒绝覆盖，使用新运行目录。
-    - 以上相对产物路径以 --run-dir 指定的 <run> 为根；描述的是成功调用时的产物，不表示目前已经生成。
+    <run>/data/raw/episode_XXX/帧号.png
+    <run>/data/raw/episode_XXX/trajectory.json
+    <run>/data/raw/manifest.json
+    <run>/reports/expert_goal_0.gif
+    <run>/reports/expert_goal_1.gif
 
-独立运行：
-    - 不需要直接执行；这是由流程入口或其他内部模块导入的实现文件。
-    - 对应入口为 /Users/zrp/Desktop/lora/smol/smol_workflow/p03_data_collection/03_01_collect_data.py；下面演示该入口，不把内部文件当作单独步骤。
+运行：
+    作为依赖导入，不单独运行。
 
-运行参数：
-    - 本文件无命令行；collect(c, run) 执行采集，episode_records(run, e) 读取某轨迹记录。
-    - episodes、train_episodes、test_episodes、seed 与 fps 从 JSON 配置读取，不是独立命令行选项。
-
-用法：
-    ```bash
-    conda run -n embodiedai python /Users/zrp/Desktop/lora/smol/smol_workflow/p03_data_collection/03_01_collect_data.py --run-dir /Users/zrp/Desktop/lora/smol/outputs/standard_run --device auto
-    ```
+参数：
+    无
 
 被谁依赖：
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p00_pipeline/_impl/p00_cli.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p04_data_processing/_impl/p04_data.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p00_pipeline/00_01_check_structure.py` 会按目录扫描本文件，进行语法/导入或入口参数检查（不是业务执行步骤）。"""
+    p00_cli.py
+    p04_data.py
+"""
 from PIL import Image
 from smol_workflow.p00_pipeline._impl.p00_common import read_json, write_json, save_gif
 from smol_workflow.p02_simulation._impl.p02_environment import Expert, make_env

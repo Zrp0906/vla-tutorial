@@ -1,41 +1,37 @@
-r"""提供 SmolVLA 全流程的配置、设备、序列化、随机种子与资源记录工具。
+"""
+功能：
+    读写配置和 JSON，选择设备，固定随机种子，计算哈希，保存 GIF。
 
 输入：
-    - 函数传入的 JSON 路径、数据、seed、torch.device 或 RGB 帧。
-    - 默认配置 configs/standard.json；ROOT 指向 smol，导入时设置项目 HF_HOME 与禁用 Xet 的默认环境变量。
+    configs/standard.json
+    调用方给出的 JSON 文件
+    调用方给出的二进制文件
 
 输出：
-    - 返回配置、设备、哈希、时间或资源记录；write_json 原子替换目标 JSON，save_gif 写实际帧回放。
-    - memory_report 使用 Unix resource 模块，Windows 的该函数尚非实测兼容；导入本模块不启动训练。
+    调用方给出的 JSON 文件
+    调用方给出的 GIF 文件
 
-独立运行：
-    - 不需要直接执行；这是由流程入口或其他内部模块导入的实现文件。
-    - 对应入口为 /Users/zrp/Desktop/lora/smol/smol_workflow/p01_environment/01_01_check_environment.py；下面演示该入口，不把内部文件当作单独步骤。
+运行：
+    作为依赖导入，不单独运行。
 
-运行参数：
-    - 本文件不解析命令行；常用函数为 config(path=None)、device(request='auto')、write_json(path, value)、save_gif(path, frames, fps=10)。
-    - 下方用法通过 01_01 环境入口调用公共工具；该入口参数见对应模块文档。
-
-用法：
-    ```bash
-    conda run -n embodiedai python /Users/zrp/Desktop/lora/smol/smol_workflow/p01_environment/01_01_check_environment.py --run-dir /Users/zrp/Desktop/lora/smol/outputs/standard_run --device auto
-    ```
+参数：
+    无
 
 被谁依赖：
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p00_pipeline/00_01_check_structure.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p00_pipeline/_impl/p00_cli.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p01_environment/_impl/p01_environment.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p02_simulation/_impl/p02_checks.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p03_data_collection/_impl/p03_data.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p04_data_processing/_impl/p04_data.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p05_model_baseline/_impl/p05_model.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p06_supervised_post_training/_impl/p06_training.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p08_evaluation/_impl/p08_evaluation.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p09_merge_quantization/_impl/p09_quantization.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p10_deployment/_impl/p10_deployment.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p10_deployment/_impl/p10_server.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p11_feedback_summary/_impl/p11_summary.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p00_pipeline/00_01_check_structure.py` 会按目录扫描本文件，进行语法/导入或入口参数检查（不是业务执行步骤）。"""
+    00_01_check_structure.py
+    p00_cli.py
+    p01_environment.py
+    p02_checks.py
+    p03_data.py
+    p04_data.py
+    p05_model.py
+    p06_training.py
+    p08_evaluation.py
+    p09_quantization.py
+    p10_deployment.py
+    p10_server.py
+    p11_summary.py
+"""
 # 按工作流阶段组织，入口与实现同目录。
 from __future__ import annotations
 import hashlib

@@ -1,31 +1,27 @@
-r"""按 01_01 到 11_01 的实际执行顺序串联 SmolVLA 全流程。
+"""
+功能：
+    按 01–11 的顺序用子进程跑完全流程，某一步失败就停止。
 
 输入：
-    - 统一配置、可选运行目录、设备和阶段起止范围；子进程复用当前 Python 解释器。
-    - 下载固定在 05_01，紧接 05_02 基线；后续步骤读取前面步骤的真实产物。
+    无
 
 输出：
-    - 实验生成的 data/、models/、evaluations/、reports/ 和 stages/ 位于 --run-dir 内；05_01 的预训练资产另存项目 smol/models/。
-    - --dry-run 只打印选中的执行顺序，不创建运行目录、不下载、不启动子进程；真实执行遇失败即停止。
+    无
 
-独立运行：
-    - 需要独立运行；这是按编号串联阶段脚本的总入口，不能让该入口递归调用自身。
+运行：
+    可独立运行，也可被 00_01_check_structure.py 导入。
 
-运行参数：
-    - `--config`（默认 /Users/zrp/Desktop/lora/smol/configs/standard.json）。
-    - `--run-dir`（可选；默认 /Users/zrp/Desktop/lora/smol/outputs/run_<UTC时间>）。
-    - `--device`（默认 auto，实际支持 auto/cpu/cuda/mps）。
-    - `--from-stage`（整数 1–11，默认 1）；`--to-stage`（整数 1–11，默认 11）；按第一层阶段编号筛选。
-    - `--dry-run`（开关，默认关闭；只列执行顺序）；`--help`（显示参数并退出）。
-
-用法：
-    ```bash
-    conda run -n embodiedai python /Users/zrp/Desktop/lora/smol/smol_workflow/p00_pipeline/00_02_run_pipeline.py --dry-run
-    # 真正执行完整流程时去掉 --dry-run，可加 --run-dir /Users/zrp/Desktop/lora/smol/outputs/standard_run
-    ```
+参数：
+    --config：配置文件，默认 configs/standard.json
+    --run-dir：实验目录，未写时用 outputs/run_<UTC时间>
+    --device：auto、cpu、cuda 或 mps，默认 auto
+    --from-stage：起始阶段，1–11，默认 1
+    --to-stage：结束阶段，1–11，默认 11
+    --dry-run：只打印执行顺序，不创建目录、不跑步骤
 
 被谁依赖：
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p00_pipeline/00_01_check_structure.py`（动态导入、模拟调度与 --help 检查；不实际运行训练）。"""
+    00_01_check_structure.py
+"""
 import argparse
 import os
 import subprocess

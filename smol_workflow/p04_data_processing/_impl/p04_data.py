@@ -1,33 +1,28 @@
-r"""导出 LeRobotDataset 并仅用训练轨迹计算归一化统计量。
+"""
+功能：
+    导出数据集，并用训练轨迹计算状态和动作统计量。
 
 输入：
-    - data/raw/manifest.json、原始 PNG、trajectory.json 和统一配置。
-    - 转换全部成功轨迹，但 state/action 均值和标准差只来自 train 轨迹。
+    <run>/data/raw/manifest.json
+    <run>/data/raw/episode_XXX/trajectory.json
+    <run>/data/raw/episode_XXX/帧号.png
+    <run>/data/stats.json（仅 Windows 构造训练窗口时读取）
 
 输出：
-    - data/lerobot/ 的 LeRobotDataset；data/stats.json 的训练集统计量。
-    - reports/dataset.json 包含帧数、轨迹数、数据格式与实际样本形状；已有导出目录拒绝覆盖。
-    - Windows 返回 image[3,256,256]、state[2]、actions[T,2]、is_pad[T] 和 task；T 为 chunk_size。
-    - 窗口不跨轨迹；尾部补齐、掩码和归一化由该 Dataset 处理。
-    - 以上相对产物路径以 --run-dir 指定的 <run> 为根；描述的是成功调用时的产物，不表示目前已经生成。
+    <run>/data/stats.json（process 根据训练轨迹写出）
+    <run>/data/lerobot/ 下的数据集文件
+    <run>/reports/dataset.json
 
-独立运行：
-    - 不需要直接执行；这是由流程入口或其他内部模块导入的实现文件。
-    - 对应入口为 /Users/zrp/Desktop/lora/smol/smol_workflow/p04_data_processing/04_01_process_data.py；下面演示该入口，不把内部文件当作单独步骤。
+运行：
+    作为依赖导入，不单独运行。
 
-运行参数：
-    - 本文件无命令行；process(c, run) 转换数据，Windows(c, run, split) 构造 train 或 validation 样本。
-    - window_stride、chunk_size 从配置读取；Windows 是动作窗口 Dataset 类名，不是 Windows 操作系统专用模块。
-
-用法：
-    ```bash
-    conda run -n embodiedai python /Users/zrp/Desktop/lora/smol/smol_workflow/p04_data_processing/04_01_process_data.py --run-dir /Users/zrp/Desktop/lora/smol/outputs/standard_run --device auto
-    ```
+参数：
+    无
 
 被谁依赖：
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p00_pipeline/_impl/p00_cli.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p06_supervised_post_training/_impl/p06_training.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p00_pipeline/00_01_check_structure.py` 会按目录扫描本文件，进行语法/导入或入口参数检查（不是业务执行步骤）。"""
+    p00_cli.py
+    p06_training.py
+"""
 from __future__ import annotations
 from pathlib import Path
 import numpy as np

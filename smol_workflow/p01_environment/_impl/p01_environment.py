@@ -1,30 +1,25 @@
-r"""检查已有 embodiedai 的设备、依赖一致性并记录环境快照。
+"""
+功能：
+    记录 Python、设备、关键包版本和 pip 检查结果。
 
 输入：
-    - 统一配置、运行目录和当前 Python 解释器；关键包已安装。
-    - 读取 CUDA/MPS 可用性，并在选定设备实际创建张量；不会安装或升级依赖。
+    无
 
 输出：
-    - <run>/config.json 与 reports/environment.json。
-    - reports/requirements.lock.txt、reports/pip_check.txt；依赖冲突或张量创建失败时停止。
-    - 以上相对产物路径以 --run-dir 指定的 <run> 为根；描述的是成功调用时的产物，不表示目前已经生成。
+    <run>/config.json
+    <run>/reports/environment.json
+    <run>/reports/requirements.lock.txt
+    <run>/reports/pip_check.txt
 
-独立运行：
-    - 不需要直接执行；这是由流程入口或其他内部模块导入的实现文件。
-    - 对应入口为 /Users/zrp/Desktop/lora/smol/smol_workflow/p01_environment/01_01_check_environment.py；下面演示该入口，不把内部文件当作单独步骤。
+运行：
+    作为依赖导入，不单独运行。
 
-运行参数：
-    - 本文件不解析命令行；environment_report(c, run, dev) 接收配置、运行路径和实际 torch.device。
-    - 下方环境入口的 --run-dir 必填，--config 与 --device 可选，详见该入口说明。
-
-用法：
-    ```bash
-    conda run -n embodiedai python /Users/zrp/Desktop/lora/smol/smol_workflow/p01_environment/01_01_check_environment.py --run-dir /Users/zrp/Desktop/lora/smol/outputs/standard_run --device auto
-    ```
+参数：
+    无
 
 被谁依赖：
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p00_pipeline/_impl/p00_cli.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p00_pipeline/00_01_check_structure.py` 会按目录扫描本文件，进行语法/导入或入口参数检查（不是业务执行步骤）。"""
+    p00_cli.py
+"""
 import importlib.metadata
 import platform
 import subprocess

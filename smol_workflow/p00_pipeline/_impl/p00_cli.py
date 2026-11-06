@@ -1,42 +1,38 @@
-r"""统一解析阶段参数、分派 01–11 实现并保存实际完成或失败状态。
+"""
+功能：
+    解析阶段参数，分派阶段 01–11，并把完成或失败写到 stages/NN.json。
 
 输入：
-    - 编号入口调用 main(number)；number 为阶段号 1–11。
-    - 命令行配置、运行目录、设备及该阶段需要的上游数据、模型和报告。
+    configs/standard.json
+    <run>/config.json（已存在时读取并核对）
+    阶段 05 读取 <run>/data/stats.json
+    阶段 05 读取 项目 models/assets.json
+    阶段 05 读取 项目 models/base/model.safetensors
 
 输出：
-    - 调用对应阶段实现；成功写 <run>/stages/NN.json，异常写错误与 traceback 后抛出。
-    - 运行目录存在不同 config.json 时拒绝混用；本模块导入本身不执行阶段。
-    - 以上相对产物路径以 --run-dir 指定的 <run> 为根；描述的是成功调用时的产物，不表示目前已经生成。
+    <run>/stages/NN.json
+    阶段 05 写入 <run>/models/base/runtime.json
+    阶段 05 写入 <run>/models/base/provenance.json
 
-独立运行：
-    - 不需要直接执行；这是由流程入口或其他内部模块导入的实现文件。
-    - 对应入口为 /Users/zrp/Desktop/lora/smol/smol_workflow/p01_environment/01_01_check_environment.py；下面演示该入口，不把内部文件当作单独步骤。
+运行：
+    作为依赖导入，不单独运行。
 
-运行参数：
-    - `--run-dir`（必填；本次实验目录，本文以 /Users/zrp/Desktop/lora/smol/outputs/standard_run 为例；后续步骤复用同一目录）。
-    - `--config`（可选 JSON 配置；默认 /Users/zrp/Desktop/lora/smol/configs/standard.json）。
-    - `--device`（可选 auto/cpu/cuda/mps；未传时读取配置 device，标准配置为 auto）。
-    - `--help`（显示实际参数并退出，不执行该阶段）。
-
-用法：
-    ```bash
-    conda run -n embodiedai python /Users/zrp/Desktop/lora/smol/smol_workflow/p01_environment/01_01_check_environment.py --run-dir /Users/zrp/Desktop/lora/smol/outputs/standard_run --device auto
-    ```
+参数：
+    无
 
 被谁依赖：
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p01_environment/01_01_check_environment.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p02_simulation/02_01_check_simulation.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p03_data_collection/03_01_collect_data.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p04_data_processing/04_01_process_data.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p05_model_baseline/05_02_evaluate_baseline.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p06_supervised_post_training/06_01_train_partial.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p07_lora_finetuning/07_01_train_lora.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p08_evaluation/08_01_evaluate_models.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p09_merge_quantization/09_01_merge_quantize.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p10_deployment/10_01_check_deployment.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p11_feedback_summary/11_01_summarize.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p00_pipeline/00_01_check_structure.py` 会按目录扫描本文件，进行语法/导入或入口参数检查（不是业务执行步骤）。"""
+    01_01_check_environment.py
+    02_01_check_simulation.py
+    03_01_collect_data.py
+    04_01_process_data.py
+    05_02_evaluate_baseline.py
+    06_01_train_partial.py
+    07_01_train_lora.py
+    08_01_evaluate_models.py
+    09_01_merge_quantize.py
+    10_01_check_deployment.py
+    11_01_summarize.py
+"""
 import argparse
 import traceback
 from pathlib import Path

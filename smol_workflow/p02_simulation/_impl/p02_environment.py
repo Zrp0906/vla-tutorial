@@ -1,34 +1,27 @@
-r"""定义二维推块的 Gymnasium 环境、RGB 渲染和脚本专家。
+"""
+功能：
+    定义二维推块环境、俯视 RGB 画面和脚本专家。
 
 输入：
-    - PushEnv(max_steps=200, image_size=256, step_scale=0.04) 或 make_env(c)。
-    - reset(seed, options={'goal':0或1})；step(action) 接收有限二维连续动作，裁剪到 [-1,1] 并按 step_scale 缩放。
+    无
 
 输出：
-    - 观测 state[2]、image[H,W,3] uint8 和 task 字符串；step 返回观测、奖励、终止/超时标记与 info。
-    - 方块完整进入指定区域且保持 5 步为成功；Expert.action() 返回专家二维动作，不在此模块直接保存文件。
+    无
 
-独立运行：
-    - 不需要直接执行；这是由流程入口或其他内部模块导入的实现文件。
-    - 对应入口为 /Users/zrp/Desktop/lora/smol/smol_workflow/p02_simulation/02_01_check_simulation.py；下面演示该入口，不把内部文件当作单独步骤。
+运行：
+    作为依赖导入，不单独运行。
 
-运行参数：
-    - 本文件无命令行参数；构造与 reset/step 参数见输入说明。
-    - 在 02_01 入口进行两条指令专家检查，--run-dir 必填。
-
-用法：
-    ```bash
-    conda run -n embodiedai python /Users/zrp/Desktop/lora/smol/smol_workflow/p02_simulation/02_01_check_simulation.py --run-dir /Users/zrp/Desktop/lora/smol/outputs/standard_run --device auto
-    ```
+参数：
+    无
 
 被谁依赖：
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p02_simulation/_impl/p02_checks.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p03_data_collection/_impl/p03_data.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p08_evaluation/_impl/p08_evaluation.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p09_merge_quantization/_impl/p09_quantization.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p10_deployment/_impl/p10_deployment.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p10_deployment/_impl/p10_server.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p00_pipeline/00_01_check_structure.py` 会按目录扫描本文件，进行语法/导入或入口参数检查（不是业务执行步骤）。"""
+    p02_checks.py
+    p03_data.py
+    p08_evaluation.py
+    p09_quantization.py
+    p10_deployment.py
+    p10_server.py
+"""
 # 内部实现：由同阶段入口调用，不是独立执行步骤。
 # 按工作流阶段组织，入口与实现同目录。
 from __future__ import annotations

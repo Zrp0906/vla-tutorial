@@ -1,27 +1,23 @@
-r"""在流程开始前检查目录编号、模块导入、入口参数与真实调度顺序。
+"""
+功能：
+    检查阶段目录、入口编号、内部模块导入和总入口调度顺序，不下载、不训练。
 
 输入：
-    - smol_workflow/ 中的 Python 源码、阶段目录、总入口 STEPS 与默认配置。
-    - 已安装关键依赖的 embodiedai 环境；检查阶段入口的 --help，不加载模型权重。
+    smol_workflow/**/*.py
+    configs/standard.json
 
 输出：
-    - 终端 PASS 或明确异常，检查入口编号唯一、顺序连续、导入与参数可用。
-    - 在临时目录模拟调度顺序、05_01/05_02 顺序、dry-run 无执行副作用和上游失败即停；临时目录自动清理。
-    - 不保存训练产物，不下载、不采集、不训练，也不证明真实模型或三平台运行已通过。
+    无
 
-独立运行：
-    - 需要独立运行；建议在启动总流程前进行自检，总入口不会自动运行本检查。
+运行：
+    独立运行。
 
-运行参数：
-    - `--help`（显示检查说明并退出）；无其他命令行参数。
-
-用法：
-    ```bash
-    conda run -n embodiedai python /Users/zrp/Desktop/lora/smol/smol_workflow/p00_pipeline/00_01_check_structure.py
-    ```
+参数：
+    无
 
 被谁依赖：
-    - 无源码中的直接导入或固定路径引用；由使用者独立调用，或通过目录扫描发现。"""
+    无
+"""
 from __future__ import annotations
 
 import argparse

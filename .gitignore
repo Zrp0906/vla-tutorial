@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+.venv/
+venv/
+
+# 本地环境与编辑器
+.env
+.DS_Store
+.ipynb_checkpoints/
+
+# 预训练资产：base/、processor/、assets.json、Hugging Face 缓存
+models/
+**/.cache/
+
+# 一次实验的运行目录：数据、检查点、评测、报告
+outputs/
+
+# 权重不要进仓库；训练产物已在 outputs/ 内
+*.safetensors

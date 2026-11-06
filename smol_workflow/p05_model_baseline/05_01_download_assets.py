@@ -1,28 +1,25 @@
-r"""获取真实 SmolVLA 权重与处理器文件，并记录上游不可变 revision。
+"""
+功能：
+    下载 SmolVLA 权重和处理器，已有 models/assets.json 时只打印清单。
 
 输入：
-    - 网络可访问 Hugging Face；基础仓库 lerobot/smolvla_base 与处理器仓库 HuggingFaceTB/SmolVLM2-500M-Video-Instruct。
-    - 若 models/assets.json 已存在，只打印现有清单并返回；未存在时解析仓库当前 SHA 后按该 revision 下载。
+    项目 models/assets.json（已存在时只读取）
 
 输出：
-    - 项目 models/base/、models/processor/ 和 models/assets.json，不写入实验 --run-dir。
-    - 只下载处理器定义与分词器文件，不再下载第二份完整 VLM；模型缓存使用项目 HF_HOME。
-    - 不安装或替换 embodiedai；不上传 Hub，也不在此脚本验证前向/反向。
+    项目 models/base/config.json
+    项目 models/base/model.safetensors
+    项目 models/processor/ 下的处理器文件
+    项目 models/assets.json
 
-独立运行：
-    - 需要独立运行，或交给 00_02_run_pipeline.py 按编号顺序调用。
+运行：
+    可独立运行，也可由 00_02_run_pipeline.py 调用。
 
-运行参数：
-    - `--help`（显示说明并退出）；没有 --config、--run-dir 或 --device 参数。
-
-用法：
-    ```bash
-    conda run -n embodiedai python /Users/zrp/Desktop/lora/smol/smol_workflow/p05_model_baseline/05_01_download_assets.py
-    ```
+参数：
+    无
 
 被谁依赖：
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p00_pipeline/00_02_run_pipeline.py`（入口路径引用/子进程调度）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p00_pipeline/00_01_check_structure.py` 会按目录扫描本文件，进行语法/导入或入口参数检查（不是业务执行步骤）。"""
+    00_02_run_pipeline.py
+"""
 # 执行步骤 05_01：在数据处理之后、基线评测之前获取模型资产。
 import json
 import os

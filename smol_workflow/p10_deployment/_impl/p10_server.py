@@ -1,33 +1,30 @@
-r"""在本机启动无动作队列的串行 HTTP SmolVLA 推理服务。
+"""
+功能：
+    在 127.0.0.1 提供 /health 和 /predict，按当前观测返回动作。
 
 输入：
-    - --checkpoint 指定真实推理包；仍需要项目中的基础模型/处理器资产与统计量。
-    - /predict 请求包含 task、有限 state[2]、256×256 PNG 的 image_png_base64 和可选 noise_seed。
+    --checkpoint 目录中的 config.json
+    --checkpoint 目录中的 runtime.json
+    --checkpoint 目录中的 model.safetensors 或 adapter_model.safetensors
+    --checkpoint 目录中的 quantization.json（INT8 包）
+    项目 models/base/ 下的权重（基础包或适配器包）
+    项目 models/processor/ 下的处理器文件
 
 输出：
-    - 仅绑定 127.0.0.1，提供 /health 与 /predict；后者返回 actions[T,2]、model 与 seconds。
-    - 终端 READY 与访问日志；本模块不保存回放，部署检查才写 server.log、JSON 和 GIF。
-    - 本服务持续运行直到停止，无跨请求动作队列；正常参数 --help 不加载权重也不绑定端口。
+    无
 
-独立运行：
-    - 可在真实推理包准备好后，以 -m 方式独立启动；也由 10_01 部署检查在子进程中自动调用。
-    - 仅执行 10_01 检查时无需手动先启动服务器；下方例子要求 models/merged 已实际生成。
+运行：
+    可独立运行，也可由 p10_deployment.py 启动。
 
-运行参数：
-    - `--checkpoint`（必填；真实推理包目录，示例使用 /Users/zrp/Desktop/lora/smol/outputs/standard_run/models/merged）。
-    - `--device`（默认 auto；支持 auto/cpu/cuda/mps）。
-    - `--port`（整数，默认 8765）；`--help`（显示参数并退出）。
-
-用法：
-    ```bash
-    cd /Users/zrp/Desktop/lora/smol
-    conda run -n embodiedai python -m smol_workflow.p10_deployment._impl.p10_server --checkpoint /Users/zrp/Desktop/lora/smol/outputs/standard_run/models/merged --device auto --port 8765
-    ```
+参数：
+    --checkpoint：推理包目录，必填
+    --device：auto、cpu、cuda 或 mps，默认 auto
+    --port：监听端口，默认 8765
 
 被谁依赖：
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p00_pipeline/00_01_check_structure.py`（模块名称引用/动态调用）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p10_deployment/_impl/p10_deployment.py`（模块名称引用/动态调用）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p00_pipeline/00_01_check_structure.py` 会按目录扫描本文件，进行语法/导入或入口参数检查（不是业务执行步骤）。"""
+    00_01_check_structure.py
+    p10_deployment.py
+"""
 import argparse
 import base64
 import io

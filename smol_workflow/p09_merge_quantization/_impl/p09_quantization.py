@@ -1,32 +1,39 @@
-r"""合并 LoRA，校验固定噪声输出，再生成教学 INT8 权重存储版本。
+"""
+功能：
+    合并 LoRA 权重，并把指定 Linear 层存成逐通道 INT8。
 
 输入：
-    - 选中的 LoRA 适配器、对应基础模型、归一化统计量与固定测试场景。
-    - 只量化 lm_expert 中的 Linear 权重；输入输出投影等未选中模块保留浮点。
+    <run>/models/lora/selected.json
+    <run>/models/lora/epoch_N/runtime.json
+    <run>/models/lora/epoch_N/adapter_config.json
+    <run>/models/lora/epoch_N/adapter_model.safetensors
+    项目 models/base/config.json
+    项目 models/base/model.safetensors
+    项目 models/processor/ 下的处理器文件
+    项目 models/assets.json
 
 输出：
-    - models/merged/ 完整浮点推理包；models/int8/ 含 INT8 权重、逐通道 scale 和 quantization.json。
-    - reports/quantization.json 保存合并/量化差异、覆盖率与文件大小；evaluations/merged/、int8/ 保存闭环结果。
-    - 采用按层反量化后浮点计算，不宣称 INT8 内核加速；合并数值对比不通过则停止。
-    - 以上相对产物路径以 --run-dir 指定的 <run> 为根；描述的是成功调用时的产物，不表示目前已经生成。
+    <run>/models/merged/config.json
+    <run>/models/merged/runtime.json
+    <run>/models/merged/provenance.json
+    <run>/models/merged/model.safetensors
+    <run>/models/int8/config.json
+    <run>/models/int8/runtime.json
+    <run>/models/int8/provenance.json
+    <run>/models/int8/model.safetensors
+    <run>/models/int8/quantization.json
+    <run>/reports/quantization.json
 
-独立运行：
-    - 不需要直接执行；这是由流程入口或其他内部模块导入的实现文件。
-    - 对应入口为 /Users/zrp/Desktop/lora/smol/smol_workflow/p09_merge_quantization/09_01_merge_quantize.py；下面演示该入口，不把内部文件当作单独步骤。
+运行：
+    作为依赖导入，不单独运行。
 
-运行参数：
-    - 本模块不解析命令行；convert(c, run, dev) 合并并量化，replace_named(policy, names) 替换指定 Linear。
-    - Int8Linear(layer) 将每个输出通道权重存为 INT8；scale 和 bias 保留浮点。
-
-用法：
-    ```bash
-    conda run -n embodiedai python /Users/zrp/Desktop/lora/smol/smol_workflow/p09_merge_quantization/09_01_merge_quantize.py --run-dir /Users/zrp/Desktop/lora/smol/outputs/standard_run --device auto
-    ```
+参数：
+    无
 
 被谁依赖：
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p00_pipeline/_impl/p00_cli.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p05_model_baseline/_impl/p05_model.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p00_pipeline/00_01_check_structure.py` 会按目录扫描本文件，进行语法/导入或入口参数检查（不是业务执行步骤）。"""
+    p00_cli.py
+    p05_model.py
+"""
 from __future__ import annotations
 import time
 import numpy as np

@@ -1,30 +1,33 @@
-r"""汇总实际训练、评测、量化与部署报告并收集失败场景。
+"""
+功能：
+    读取已有报告，写出总结、失败场景和 REPORT.md。
 
 输入：
-    - evaluations/*/report.json、部分微调和 LoRA 的 models/*/report.json。
-    - reports/quantization.json、deployment.json 及各模型逐回合记录；上游缺失会报错。
+    <run>/evaluations/*/report.json
+    <run>/evaluations/base/episode_XXX.json
+    <run>/evaluations/partial/episode_XXX.json
+    <run>/evaluations/lora/episode_XXX.json
+    <run>/evaluations/merged/episode_XXX.json
+    <run>/evaluations/int8/episode_XXX.json
+    <run>/models/partial/report.json
+    <run>/models/lora/report.json
+    <run>/reports/quantization.json
+    <run>/reports/deployment.json
 
 输出：
-    - reports/summary.json、failure_cases.json 和 REPORT.md。
-    - 汇总真实成功率、距离、延迟、两轮训练与平台范围；本脚本不重新采集、训练或评测。
-    - 以上相对产物路径以 --run-dir 指定的 <run> 为根；描述的是成功调用时的产物，不表示目前已经生成。
+    <run>/reports/summary.json
+    <run>/reports/failure_cases.json
+    <run>/reports/REPORT.md
 
-独立运行：
-    - 不需要直接执行；这是由流程入口或其他内部模块导入的实现文件。
-    - 对应入口为 /Users/zrp/Desktop/lora/smol/smol_workflow/p11_feedback_summary/11_01_summarize.py；下面演示该入口，不把内部文件当作单独步骤。
+运行：
+    作为依赖导入，不单独运行。
 
-运行参数：
-    - 本模块无命令行；summary(c, run) 汇总同一运行目录中的既有结果。
-    - 通过 11_01 入口指定 --run-dir；不会自动补做缺失的上游阶段。
-
-用法：
-    ```bash
-    conda run -n embodiedai python /Users/zrp/Desktop/lora/smol/smol_workflow/p11_feedback_summary/11_01_summarize.py --run-dir /Users/zrp/Desktop/lora/smol/outputs/standard_run --device auto
-    ```
+参数：
+    无
 
 被谁依赖：
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p00_pipeline/_impl/p00_cli.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p00_pipeline/00_01_check_structure.py` 会按目录扫描本文件，进行语法/导入或入口参数检查（不是业务执行步骤）。"""
+    p00_cli.py
+"""
 import platform
 from smol_workflow.p00_pipeline._impl.p00_common import now, read_json, write_json
 

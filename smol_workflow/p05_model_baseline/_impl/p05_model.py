@@ -1,34 +1,35 @@
-r"""适配真实 SmolVLA 的二维输入输出，提供模型加载、Flow Matching 与推理包接口。
+"""
+功能：
+    加载 SmolVLA，计算 Flow Matching 损失，打包和执行推理。
 
 输入：
-    - models/base/ 的真实 SmolVLA 配置和权重、models/processor/ 分词器以及训练集 state/action 统计量。
-    - 训练 batch 的 CHW 图像、状态、动作块、padding 掩码与任务；推理观测为 RGB 图像、state[2]、task。
+    项目 models/base/config.json
+    项目 models/base/model.safetensors
+    项目 models/processor/ 下的处理器文件
+    项目 models/assets.json
+    推理包中的 runtime.json
+    推理包中的 model.safetensors 或 adapter_model.safetensors
+    推理包中的 quantization.json（INT8 包）
 
 输出：
-    - load_base/load_package 返回真实策略；Processor 将语言补换行并分词、迁移设备及反归一化动作。
-    - flow_loss 返回仅有效时间步与外部二维动作的损失；Runtime.predict 返回环境单位 actions[T,2] 和耗时。
-    - package 写配置、runtime.json、来源哈希及完整权重或适配器；所有产物需真正调用后才创建。
+    推理包中的 config.json
+    推理包中的 runtime.json
+    推理包中的 provenance.json
+    推理包中的 model.safetensors 或 adapter_model.safetensors
 
-独立运行：
-    - 不需要直接执行；这是由流程入口或其他内部模块导入的实现文件。
-    - 对应入口为 /Users/zrp/Desktop/lora/smol/smol_workflow/p05_model_baseline/05_02_evaluate_baseline.py；下面演示该入口，不把内部文件当作单独步骤。
+运行：
+    作为依赖导入，不单独运行。
 
-运行参数：
-    - 本文件不解析命令行；load_base(c, dev)、Runtime(folder, dev)、predict(obs, noise_seed=None) 与 package(...) 是 Python 接口。
-    - 先运行 05_01 下载，再用 05_02 基线入口检查；本次文档更新不表示模型已成功加载。
-
-用法：
-    ```bash
-    conda run -n embodiedai python /Users/zrp/Desktop/lora/smol/smol_workflow/p05_model_baseline/05_02_evaluate_baseline.py --run-dir /Users/zrp/Desktop/lora/smol/outputs/standard_run --device auto
-    ```
+参数：
+    无
 
 被谁依赖：
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p00_pipeline/_impl/p00_cli.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p06_supervised_post_training/_impl/p06_training.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p09_merge_quantization/_impl/p09_quantization.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p10_deployment/_impl/p10_deployment.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p10_deployment/_impl/p10_server.py`（直接导入）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p00_pipeline/00_01_check_structure.py` 会按目录扫描本文件，进行语法/导入或入口参数检查（不是业务执行步骤）。"""
+    p00_cli.py
+    p06_training.py
+    p09_quantization.py
+    p10_deployment.py
+    p10_server.py
+"""
 from __future__ import annotations
 import hashlib
 import time
@@ -38,9 +39,13 @@ import torch
 from smol_workflow.p00_pipeline._impl.p00_common import ROOT, read_json, write_json, sha256, synchronize
 
 def model_config(c, dev, source=None):
-    from lerobot.policies.smolvla.configuration_smolvla import SmolVLAConfig
+    from lerobot.configs.policies import PreTrainedConfig
     from lerobot.configs.types import PolicyFeature, FeatureType
-    cfg = SmolVLAConfig.from_pretrained(str(source or ROOT / "models" / "base"))
+    # 导入后才会把 smolvla 注册到配置表。检查点里的 type 由基类识别，不能直接交给 SmolVLAConfig。
+    from lerobot.policies.smolvla.configuration_smolvla import SmolVLAConfig
+    cfg = PreTrainedConfig.from_pretrained(str(source or ROOT / "models" / "base"))
+    if not isinstance(cfg, SmolVLAConfig):
+        raise TypeError(f"需要 SmolVLAConfig，实际得到 {type(cfg).__name__}")
     cfg.device = str(dev)
     # 完整 SmolVLA checkpoint 已包含视觉语言骨干，无需第二次下载骨干权重。
     cfg.load_vlm_weights = False

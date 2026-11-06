@@ -1,29 +1,25 @@
-r"""初始化仿真阶段的 Python 包命名空间。
+"""
+功能：
+    初始化推块仿真包。
 
 输入：
-    - Python 导入 smol_workflow.p02_simulation 或其子模块。
+    无
 
 输出：
-    - 提供包命名空间和模块文档；本文件不导出业务函数，不创建数据、模型、回放或报告。
+    无
 
-独立运行：
-    - 不需要独立运行；__init__.py 是 Python 包初始化文件，不是执行顺序中的步骤。
-    - 仅导入此文件不会执行训练；具体操作由同阶段编号入口调用。
+运行：
+    作为依赖导入，不单独运行。
 
-运行参数：
-    - 无命令行参数；包名用于 import，不是要执行的脚本。
-
-用法：
-    ```bash
-    cd /Users/zrp/Desktop/lora/smol
-    conda run -n embodiedai python -c "import smol_workflow.p02_simulation"
-    ```
+参数：
+    无
 
 被谁依赖：
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p00_pipeline/_impl/p00_cli.py`（导入子模块时初始化此包）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p02_simulation/_impl/p02_checks.py`（导入子模块时初始化此包）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p03_data_collection/_impl/p03_data.py`（导入子模块时初始化此包）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p08_evaluation/_impl/p08_evaluation.py`（导入子模块时初始化此包）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p09_merge_quantization/_impl/p09_quantization.py`（导入子模块时初始化此包）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p10_deployment/_impl/p10_deployment.py`（导入子模块时初始化此包）。
-    - `/Users/zrp/Desktop/lora/smol/smol_workflow/p10_deployment/_impl/p10_server.py`（导入子模块时初始化此包）。"""
+    p00_cli.py
+    p02_checks.py
+    p03_data.py
+    p08_evaluation.py
+    p09_quantization.py
+    p10_deployment.py
+    p10_server.py
+"""

@@ -100,10 +100,21 @@ def synchronize(dev):
         torch.mps.synchronize()
 
 def memory_report(dev):
-    import resource
     import torch
-    rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-    result = {"process_peak_rss_bytes": int(rss if platform.system() == "Darwin" else rss * 1024)}
+    system = platform.system()
+    if system == "Windows":
+        import psutil
+
+        memory = psutil.Process().memory_info()
+        peak = getattr(memory, "peak_rss", None)
+        if peak is None:
+            peak = memory.peak_wset
+    else:
+        import resource
+
+        rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+        peak = int(rss if system == "Darwin" else rss * 1024)
+    result = {"process_peak_rss_bytes": peak}
     if dev.type == "mps":
         result.update(mps_allocated_bytes=torch.mps.current_allocated_memory(),
                       mps_driver_allocated_bytes=torch.mps.driver_allocated_memory())

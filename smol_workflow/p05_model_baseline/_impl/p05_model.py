@@ -92,11 +92,13 @@ def package(policy, folder, c, stats, kind, adapter=None):
                                         "base_revision":read_json(ROOT/"models"/"assets.json")["base"]["revision"]})
 
 def load_package(folder, dev):
-    from lerobot.policies.smolvla.modeling_smolvla import SmolVLAPolicy
-    from safetensors.torch import load_model
     folder = Path(folder)
     meta = read_json(folder/"runtime.json")
-    cfg = model_config(meta["config"], "cpu", None if meta["kind"] == "base" else folder)
+    if meta["kind"] == "qlora":
+        from smol_workflow.p12_advance._impl.p12_qlora import load_qlora
+
+        policy, _ = load_qlora(meta["config"], dev, checkpoint=folder)
+        return policy.eval(), meta
     if meta["kind"] == "base":
         policy = load_base(meta["config"], torch.device("cpu"))
     elif meta["kind"] == "adapter":
@@ -105,6 +107,10 @@ def load_package(folder, dev):
         wrapped = PeftModel.from_pretrained(base, str(folder), is_trainable=False)
         policy = wrapped.get_base_model()
     else:
+        from lerobot.policies.smolvla.modeling_smolvla import SmolVLAPolicy
+        from safetensors.torch import load_model
+
+        cfg = model_config(meta["config"], "cpu", folder)
         policy = SmolVLAPolicy(cfg)
         if meta["kind"] == "int8":
             from smol_workflow.p09_merge_quantization._impl.p09_quantization import replace_named

@@ -52,12 +52,15 @@ from smol_workflow.p05_model_baseline._impl.p05_model import load_base, Processo
 
 from smol_workflow.p07_lora_finetuning._impl.p07_lora import attach_lora
 
-def train(c, run, dev, mode):
+def train(c, run, dev, mode, *, initialize=None):
     seed_all(c["seed"])
-    policy = load_base(c,dev)
-    adapter = None
-    if mode == "lora":
-        adapter, policy = attach_lora(policy,c)
+    if initialize is None:
+        policy = load_base(c,dev)
+        adapter = None
+        if mode == "lora":
+            adapter, policy = attach_lora(policy,c)
+    else:
+        policy, adapter = initialize(c, dev)
     params = [p for p in policy.parameters() if p.requires_grad]
     names = [n for n,p in policy.named_parameters() if p.requires_grad]
     if not params:
@@ -71,7 +74,7 @@ def train(c, run, dev, mode):
                         generator=torch.Generator().manual_seed(c["seed"]),drop_last=False)
     vloader = DataLoader(val_ds,batch_size=c["batch_size"],shuffle=False,num_workers=0,drop_last=False)
     processor = Processor(policy,train_ds.stats,dev)
-    lr = c["lora_lr"] if mode=="lora" else c["partial_lr"]
+    lr = c["lora_lr"] if adapter is not None else c["partial_lr"]
     opt = torch.optim.AdamW(params,lr=lr,betas=(.9,.95),weight_decay=1e-10)
     total = len(loader)*c["epochs"]
     warmup = max(1,math.ceil(total*.05))
@@ -107,7 +110,7 @@ def train(c, run, dev, mode):
             seen += size
             step += 1
             if step%10==0 or step==1:
-                print(f"{mode} epoch={epoch+1}/2 step={step}/{total} loss={loss.item():.5f} grad={norm.item():.3f}",flush=True)
+                print(f"{mode} epoch={epoch+1}/{c['epochs']} step={step}/{total} loss={loss.item():.5f} grad={norm.item():.3f}",flush=True)
             report["updates"] = step
             report["current_epoch"] = epoch+1
             report["last_loss"] = float(loss.item())
@@ -124,7 +127,8 @@ def train(c, run, dev, mode):
                 "samples_seen":seen,"seconds":time.perf_counter()-started,**memory_report(dev)}
         report["epochs"].append(item)
         checkpoint = out/f"epoch_{epoch+1}"
-        package(policy,checkpoint,c,train_ds.stats,"adapter" if adapter else "full",adapter)
+        kind = "qlora" if mode == "qlora" else "adapter" if adapter is not None else "full"
+        package(policy,checkpoint,c,train_ds.stats,kind,adapter)
         torch.save({"epoch":epoch+1,"optimizer":opt.state_dict(),"scheduler":scheduler.state_dict(),
                     "torch_rng":torch.get_rng_state(),"shuffle_rng":loader.generator.get_state()},
                     checkpoint/"training_state.pt")

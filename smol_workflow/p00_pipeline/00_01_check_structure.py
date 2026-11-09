@@ -39,8 +39,11 @@ sys.path.insert(0, str(ROOT))
 def main():
     argparse.ArgumentParser(description=__doc__).parse_args()
     package = ROOT / "smol_workflow"
-    stages = sorted(p for p in package.iterdir() if p.is_dir() and re.match(r"p\d{2}_", p.name))
-    assert [int(p.name[1:3]) for p in stages] == list(range(12)), "缺少或重复的阶段目录"
+    stages = sorted(
+        p for p in package.iterdir()
+        if p.is_dir() and re.match(r"p\d{2}_", p.name) and any(p.rglob("*.py"))
+    )
+    assert [int(p.name[1:3]) for p in stages] == list(range(13)), "缺少或重复的阶段目录"
     sources = sorted(package.rglob("*.py"))
     imported, entries = 0, []
     for source in sources:
@@ -61,7 +64,7 @@ def main():
 
     numbers = [tuple(map(int, p.stem.split("_")[:2])) for p in entries]
     assert len(numbers) == len(set(numbers)), "执行入口编号重复"
-    for stage in range(12):
+    for stage in range(13):
         substeps = sorted(second for first, second in numbers if first == stage)
         assert substeps == list(range(1, len(substeps) + 1)), f"阶段 {stage:02d} 步骤不连续"
 
@@ -69,7 +72,7 @@ def main():
     assert runtime_root == ROOT, "内部模块的项目根目录解析错误"
     assert config()["profile"] == "standard", "默认配置应为原计划的 standard"
     pipeline = importlib.import_module("smol_workflow.p00_pipeline.00_02_run_pipeline")
-    expected = [p for p in entries if not p.parent.name.startswith("p00_")]
+    expected = [p for p in entries if 1 <= int(p.name[:2]) <= 11]
     scheduled = [ROOT / script for _, script, _ in pipeline.STEPS]
     assert scheduled == expected, "总入口执行顺序与文件编号不一致"
     for stage, script, _ in pipeline.STEPS:
@@ -111,7 +114,7 @@ def main():
     if result.returncode:
         raise RuntimeError(f"HTTP 子进程入口失败：{result.stderr}")
     assert "--checkpoint" in result.stdout
-    print(f"PASS: 12 stages, {len(sources)} Python files, {imported} implementation imports, "
+    print(f"PASS: {len(stages)} stages, {len(sources)} Python files, {imported} implementation imports, "
           f"{len(entries)} uniquely ordered CLI entries and HTTP --help; "
           "dispatch order, stage 05 order, dry-run and fail-fast verified; "
           "no training or download executed.")

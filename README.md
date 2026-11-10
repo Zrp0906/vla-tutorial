@@ -10,7 +10,7 @@
 
 教程按 00–11 阅读，从 [00 从零开始](smol_workflow/p00_pipeline/00_从零开始与运行路线.md) 起，不要求先懂机器学习。
 
-完成数据准备后，可以按需运行 [12_01 SFT](smol_workflow/p12_advance/12_01_监督微调进阶.md)、[12_02 QLoRA](smol_workflow/p12_advance/12_02_QLoRA进阶.md) 和 [12_03 残差强化学习](smol_workflow/p12_advance/12_03_残差强化学习进阶.md)。待实现的功能见 [进阶功能路线](smol_workflow/p12_advance/12_进阶功能路线.md)。
+完成数据准备后，可以按需运行 [12_01 SFT](smol_workflow/p12_advance/12_01_监督微调进阶.md)、[12_02 QLoRA](smol_workflow/p12_advance/12_02_QLoRA进阶.md)、[12_03 残差强化学习](smol_workflow/p12_advance/12_03_残差强化学习进阶.md) 和 [12_04 权重空间编程](smol_workflow/p12_advance/12_04_权重空间编程进阶.md)。待实现的功能见 [进阶功能路线](smol_workflow/p12_advance/12_进阶功能路线.md)。
 
 | 顺序  | 入口                                                                  | 教程                                                                |
 | --- | ------------------------------------------------------------------- | ----------------------------------------------------------------- |

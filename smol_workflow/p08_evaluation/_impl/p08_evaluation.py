@@ -4,6 +4,7 @@
 
 输入：
     <run>/data/raw/manifest.json
+    测试场景可指定 task 和 noise_seed，覆盖推理文本和噪声起点。
     <run>/evaluations/<label>/episode_XXX.json（已存在时读取）
 
 输出：
@@ -45,9 +46,13 @@ def evaluate(c,run,label,runtime=None):
         started=time.perf_counter()
         error=None
         try:
+            if runtime:
+                noise_seed=case.get("noise_seed", c["eval_noise_seed"]+index*1000)
             while True:
                 if runtime:
-                    chunk,seconds=runtime.predict(obs,c["eval_noise_seed"]+index*1000+env.steps)
+                    if "task" in case:
+                        obs["task"]=case["task"]
+                    chunk,seconds=runtime.predict(obs,noise_seed+env.steps)
                     action=chunk[0]
                     latencies.append(seconds)
                 elif expert:
